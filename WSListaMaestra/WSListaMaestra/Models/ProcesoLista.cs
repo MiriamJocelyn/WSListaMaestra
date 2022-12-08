@@ -89,5 +89,47 @@ namespace WSListaMaestra.Models
 			}
 			return lista;
 		}
+		public List<UpdateLista> Update(JsonUpdate json)
+		{
+			List<UpdateLista> lista = new List<UpdateLista>();
+			if (json != null)
+			{
+				//verificar el JSON
+				var jsonString = new JavaScriptSerializer().Serialize(json);
+				string codigo = json.codigo;
+				string elaboracion = json.elaboracion;
+				string revision = json.revision;
+				string aprobado = json.aprobado;
+				string difusion = json.difusion;
+
+				SqlParameter[] param = new SqlParameter[5];
+				param[0] = new SqlParameter("@estatus", SqlDbType.VarChar);
+				param[1] = new SqlParameter("@nivel", SqlDbType.Int);
+				param[2] = new SqlParameter("@area", SqlDbType.VarChar);
+				param[3] = new SqlParameter("@area", SqlDbType.VarChar);
+				param[4] = new SqlParameter("@area", SqlDbType.VarChar);
+				param[0].Value = codigo;
+				param[1].Value = elaboracion;
+				param[2].Value = revision;
+				param[3].Value = aprobado;
+				param[4].Value = difusion;
+				DataSet ds = new DataSet();
+				ds = conSAP.Procedimiento("dbo.sPUpdateLista", param);
+				using (DataTable temp = ds.Tables[0])
+				{
+					if (temp.Rows.Count > 0)
+					{
+						foreach (DataRow row in temp.Rows)
+						{
+							UpdateLista res = new UpdateLista();
+							sql.ConvertFromDataTable<UpdateLista>(temp, row, res);
+							lista.Add(res);
+						}
+					}
+				}
+
+			}
+			return lista;
+		}
 	}
 }
